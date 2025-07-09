@@ -16,7 +16,7 @@
 🤖 支持 ROS2 & Python – 轻松集成现代机器人与脚本化工作流。  
 ⏱ 更精准的同步机制 – 提供更高精度的时间协调。  
 📡 数据协议更透明(JSON) – 通信更清晰、更灵活。  
-⚙️ 配置更简单 – 轻松上手，自定义更便捷[快速使用说明与系统说明](https://github.com/InfiniteSenseLab/SimpleSensorSync/wiki)。  
+⚙️ 配置更简单 – 轻松上手，自定义更便捷，可以参考[快速使用说明与系统说明](https://github.com/InfiniteSenseLab/SimpleSensorSync/wiki)。  
 📜 日志功能增强 – 记录更全面，调试更高效。   
 🌐 多平台灵活部署 – (ZeroMQ)支持嵌入式/桌面/云端多场景部署。  
 🔗 支持多相机 📷、多雷达⦿ 、IMU 🧭 与 GPS 🛰 的混合信号协同管理。  
