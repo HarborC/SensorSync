@@ -17,7 +17,7 @@ Synchronizer::Synchronizer() {
   zmq_version(&major, &minor, &patch);
   LOG(INFO) << "ZeroMQ version: " << major << "." << minor << "." << patch;
 };
-void Synchronizer::SetLogPath(const std::string& path) { SetLogDestination(FATAL, path.c_str()); }
+void Synchronizer::SetLogPath(const std::string& path) { SetLogDestination(INFO, path.c_str()); }
 void Synchronizer::SetNetLink(std::string net_dev, const unsigned int port) {
   net_ip_ = std::move(net_dev);
   net_port_ = port;
