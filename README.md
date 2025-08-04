@@ -27,7 +27,7 @@
 
 # News
 
->1. 最新硬件支持realsense系列相机(正在更新realsense接线文档)。
+>1. 最新硬件支持realsense系列相机。
 >2. 完整的[使用说明与系统说明](https://github.com/InfiniteSenseLab/SimpleSensorSync/wiki)发布。
 
 <p align="center">
