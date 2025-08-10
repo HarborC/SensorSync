@@ -43,14 +43,6 @@ class Messenger:
         except zmq.ZMQError as e:
             print(f"[ERROR] Publish error: {e}")
 
-    def pub_struct(self, topic: str, data: bytes):
-        try:
-            with self.lock:
-                self.publisher.send_string(+topic, zmq.SNDMORE)
-                self.publisher.send(data, zmq.DONTWAIT)
-        except zmq.ZMQError as e:
-            print(f"[ERROR] Publish struct error: {e}")
-
     def sub(self, topic: str, callback):
         def run():
             try:
@@ -62,7 +54,7 @@ class Messenger:
                     data_msg = subscriber.recv_string()
                     if topic_msg != topic:
                         continue
-                    callback(data_msg)
+                    callback(data_msg.encode(), len(data_msg))
             except zmq.ZMQError as e:
                 print(f"[ERROR] Exception in Sub thread for topic [{topic}]: {e}")
 
@@ -70,22 +62,3 @@ class Messenger:
         thread.start()
         self.sub_threads.append(thread)
 
-    def sub_struct(self, topic: str, callback):
-        def run():
-            try:
-                context = zmq.Context()
-                subscriber = context.socket(zmq.SUB)
-                subscriber.connect(self.endpoint)
-                subscriber.setsockopt_string(zmq.SUBSCRIBE, topic)
-                while True:
-                    topic_msg = subscriber.recv_string()
-                    data_msg = subscriber.recv()
-                    if topic_msg != topic:
-                        continue
-                    callback(data_msg)
-            except zmq.ZMQError as e:
-                print(f"[ERROR] Exception in SubStruct for topic [{topic}]: {e}")
-
-        thread = threading.Thread(target=run, daemon=True)
-        thread.start()
-        self.sub_threads.append(thread)

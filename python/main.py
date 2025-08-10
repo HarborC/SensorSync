@@ -1,20 +1,8 @@
 import logging
 import time
-import threading
 from infinite_sense_core.infinit_sense import Synchronizer
+from infinite_sense_core.message import Messenger
 
-class Messenger:
-    @staticmethod
-    def get_instance():
-        return Messenger()
-
-    def sub_struct(self, topic, callback):
-        def run():
-            while True:
-                time.sleep(1)
-                fake_data = b"fake binary data"
-                callback(fake_data, len(fake_data))
-        threading.Thread(target=run, daemon=True).start()
 
 class MockSensor:
     def initialization(self):
@@ -52,8 +40,8 @@ def main():
     synchronizer.start()
 
     messenger = Messenger.get_instance()
-    messenger.sub_struct("imu_1", imu_callback)
-    messenger.sub_struct("cam_1", image_callback)
+    messenger.sub("imu_1", imu_callback)
+    messenger.sub("cam_1", image_callback)
 
     logging.info("Synchronizer is running. Press Ctrl+C to exit.")
 
