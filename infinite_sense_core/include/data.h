@@ -33,14 +33,13 @@ inline void ProcessIMUData(const nlohmann::json &data) {
 };
 
 inline void ProcessGPSData(const nlohmann::json &data) {
-  if (data["f"] != "GNGGA") {
-    return;
+  if (data["f"] == "GNGGA"||data["f"] == "GNRMC") {
+    GPSData gps{};
+    gps.data = data["d"];
+    gps.trigger_time_us = data["pps"];
+    gps.time_stamp_us = data["t"];
+    Messenger::GetInstance().PubStruct("gps", &gps, sizeof(gps));
   }
-  GPSData gps{};
-  gps.data = data["d"];
-  gps.trigger_time_us = data["pps"];
-  gps.time_stamp_us = data["t"];
-  Messenger::GetInstance().PubStruct("gps", &gps, sizeof(gps));
 };
 
 inline void ProcessLOGData(const nlohmann::json &data) {
