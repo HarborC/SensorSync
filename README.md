@@ -41,8 +41,8 @@
 >| 设备类型        | 品牌                            |同步方式 |
 >|-------------|-------------------------------|--------|
 >| 深度相机    | RealSense系列              | PWM    |
->| 工业相机(网口)    | 海康/大华/大恒/京航/PointGrey/Basler/...               | PWM    |
->| 工业相机(USB)   | 海康/大华/大恒/京航/PointGrey/Basler/...               | PWM    |
+>| 工业相机(网口)    | 海康/华睿/大恒/京航/PointGrey/Basler/...               | PWM    |
+>| 工业相机(USB)   | 海康/华睿/大恒/京航/PointGrey/Basler/...               | PWM    |
 >| 特殊相机   | OAK/...               | PWM    |
 >| 第三方IMU      | Xsense系列/HiPNUC...                 | PWM    |
 >| 3D激光        | Mid360/Mid70/RoboSense/Tele-15/Horizon系列/...  | PPS   |
