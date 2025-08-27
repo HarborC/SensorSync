@@ -46,7 +46,7 @@
 >| 特殊相机   | OAK/...               | PWM    |
 >| 第三方IMU      | Xsense系列/HiPNUC...                 | PWM    |
 >| 3D激光        | Mid360/Mid70/RoboSense/Tele-15/Horizon系列/...  | PPS   |
->| RTK/GPS/组合导航系统     | 所有支持NMEA0183设备                | NMEA   |
+>| RTK/GPS/组合导航    | 所有支持NMEA0183设备                | NMEA   |
 >| 主机(ARM/X86) | Intel/AMD/Jetson/RockChip/... | PTP    |
 
 
