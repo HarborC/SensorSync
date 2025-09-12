@@ -18,11 +18,29 @@ void ImageCallback(const void *msg, size_t) {
   // 处理图像数据
 }
 
-int main() {
+int main(int argc, char* argv[]) {
   // 1.创建同步器
   Synchronizer synchronizer;
-  // synchronizer.SetUsbLink("/dev/ttyACM0", 921600);
-  synchronizer.SetNetLink("192.168.1.188", 8888);
+
+  if (argc < 2) {
+    // 默认使用串口
+    std::cout << "未传入参数，默认使用 USB 串口 /dev/ttyACM0" << std::endl;
+    synchronizer.SetUsbLink("/dev/ttyACM0", 921600);
+  } else {
+    std::string mode = argv[1];
+    if (mode == "uart") {
+      std::cout << "参数为 uart，使用 USB 串口 /dev/ttyACM0" << std::endl;
+      synchronizer.SetUsbLink("/dev/ttyACM0", 921600);
+    } else if (mode == "net") {
+      std::cout << "参数为 net，使用网口 192.168.1.188:8888" << std::endl;
+      synchronizer.SetNetLink("192.168.1.188", 8888);
+    } else {
+      std::cerr << "未知参数: " << mode 
+                << "，请使用 uart / net 或不传参数" << std::endl;
+      return -1;
+    }
+  }
+
   // 2.配置同步接口
   auto mv_cam = std::make_shared<MvCam>();
   mv_cam->SetParams({{"cam_1", CAM_1}});
@@ -38,6 +56,7 @@ int main() {
   while (true) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
+
   // 5.停止同步
   synchronizer.Stop();
   return 0;
