@@ -9,6 +9,7 @@ namespace infinite_sense {
 // 继承自 Sensor 类，会自动调用初始化，开始，停止等函数 
 class VideoCam final : public Sensor {
  public:
+  VideoCam(const std::vector<std::pair<std::string, int>>& cam_list);
   ~VideoCam() override;
 
   bool Initialization() override; // 相机初始化函数
@@ -19,12 +20,13 @@ class VideoCam final : public Sensor {
   // 具体读取相机的实现
   void Receive(void* handle, const std::string&) override;
   // opencv 读取 video 设备的函数
-  cv::VideoCapture cap_;
+  std::map<std::string, cv::VideoCapture> caps_;  
+  std::vector<std::pair<std::string, int>> cam_lists_;
   // 是否初始化的标识
   std::atomic<bool> is_initialized_{false};
 
   // 读取图像设备的多线程，一个线程读取一个相机
   std::mutex cap_mutex_;
-  std::vector<std::thread> cam_threads;
+  std::vector<std::thread> cam_threads_;
 };
 }  // namespace infinite_sense

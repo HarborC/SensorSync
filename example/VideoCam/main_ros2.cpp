@@ -8,38 +8,79 @@
 
 #include <sensor_msgs/msg/imu.hpp>
 
+
+struct video_config {
+    bool onboard_imu = true;// 使用内部IMU
+    bool extern_imu = false;// 使用外部IMU,TODO 
+    std::string imu_name = "imu_1";
+
+    // 相机名称 + 设备ID
+    std::pair<std::string, int> CAM3_Video = {"left_cam",  0};
+    std::pair<std::string, int> CAM4_Video = {"right_cam", -1};
+    std::pair<std::string, int> CAM1_Video = {"front_cam", -1};
+    std::pair<std::string, int> CAM2_Video = {"rear_cam", -1}; // -1 代表没有
+
+    // 通信方式
+    int type = 0; // 0 --> 串口通信  1 --> 网口通信
+    std::string uart_dev = "/dev/ttyACM0";
+    std::string net_ip = "192.168.1.188";
+    int net_port = 8888;
+};
+video_config cfg;
+
+using namespace infinite_sense;
+
 // 继承自 rclcpp::Nod
 class CamDriver final : public rclcpp::Node {
  public:
   CamDriver()
-      : Node("ros2_cam_driver"), node_handle_(std::shared_ptr<CamDriver>(this, [](auto *) {})), transport_(node_handle_) {
-    // 相机名称，注意和video_cam.cpp 中的相机名称保持一致
-    std::string camera_name_1 = "video_cam";
-    // IMU 设备名称，自定义即可
-    const std::string imu_name = "imu_1";
-    // 使用串口设备进行同步，这里可以选择不同的设备
-    synchronizer_.SetUsbLink("/dev/ttyACM0", 921600);
-    // synchronizer_.SetNetLink("192.168.1.188", 8888);
-    // 构建 VideoCam 类
-    const auto video_cam = std::make_shared<infinite_sense::VideoCam>();
-    // 重要！！！注册相机名称video_cam， 并且绑定 CAM_1 接口，也就是 video_cam对应的设备必须要接到 CAM_1
-    video_cam->SetParams({{camera_name_1, infinite_sense::CAM_1}
-    });
-    // 同步类设置添加相机类 
-    synchronizer_.UseSensor(video_cam);
+      : Node("ros2_video_demo"), node_handle_(std::shared_ptr<CamDriver>(this, [](auto *) {})), transport_(node_handle_){
+    
+    // 相机通信方式
+    if (cfg.type == 0) {
+      synchronizer_.SetUsbLink(cfg.uart_dev, 921600);
+    } else if (cfg.type == 1) {
+      synchronizer_.SetNetLink(cfg.net_ip, cfg.net_port);
+    }
+
+    std::vector<std::pair<std::string, int>> cam_list;
+    if (cfg.CAM1_Video.second >= 0) cam_list.push_back(cfg.CAM1_Video);
+    if (cfg.CAM2_Video.second >= 0) cam_list.push_back(cfg.CAM2_Video);
+    if (cfg.CAM3_Video.second >= 0) cam_list.push_back(cfg.CAM3_Video);
+    if (cfg.CAM4_Video.second >= 0) cam_list.push_back(cfg.CAM4_Video);
+
+    video_cam_ = std::make_shared<VideoCam>(cam_list);
+    synchronizer_.UseSensor(video_cam_);
+
+    if (cfg.onboard_imu) {
+      imu_pub_ = this->create_publisher<sensor_msgs::msg::Imu>(cfg.imu_name, 1000);
+    }
+
+    if (cfg.CAM1_Video.second >= 0) image_pubs_[cfg.CAM1_Video.first] = transport_.advertise(cfg.CAM1_Video.first, 30);
+    if (cfg.CAM2_Video.second >= 0) image_pubs_[cfg.CAM2_Video.first] = transport_.advertise(cfg.CAM2_Video.first, 30);
+    if (cfg.CAM3_Video.second >= 0) image_pubs_[cfg.CAM3_Video.first] = transport_.advertise(cfg.CAM3_Video.first, 30);
+    if (cfg.CAM4_Video.second >= 0) image_pubs_[cfg.CAM4_Video.first] = transport_.advertise(cfg.CAM4_Video.first, 30);
+    
+    // 设置触发参数（如果有的话）
+    // 这里用相机名作为 key
+    if (cfg.CAM1_Video.second >= 0) video_cam_->SetParams({{cfg.CAM1_Video.first, CAM_1}});
+    if (cfg.CAM2_Video.second >= 0) video_cam_->SetParams({{cfg.CAM2_Video.first, CAM_2}});
+    if (cfg.CAM3_Video.second >= 0) video_cam_->SetParams({{cfg.CAM3_Video.first, CAM_3}});
+    if (cfg.CAM4_Video.second >= 0) video_cam_->SetParams({{cfg.CAM4_Video.first, CAM_4}});
 
     // 逐个调用开始函数 
     synchronizer_.Start();
 
-    // IMU 和 图像信息的发布函数 
-    imu_pub_ = this->create_publisher<sensor_msgs::msg::Imu>(imu_name, 10);
-    img1_pub_ = transport_.advertise(camera_name_1, 10);
+
     // SDK 获取IMU和图像信息之后的回调函数 
     {
-      using namespace std::placeholders;
-      infinite_sense::Messenger::GetInstance().SubStruct(imu_name, std::bind(&CamDriver::ImuCallback, this, _1, _2));
-      infinite_sense::Messenger::GetInstance().SubStruct(camera_name_1,
-                                                         std::bind(&CamDriver::ImageCallback1, this, _1, _2));
+      Messenger::GetInstance().SubStruct(
+        cfg.imu_name, std::bind(&CamDriver::ImuCallback, this, std::placeholders::_1, std::placeholders::_2));
+
+      if (cfg.CAM1_Video.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM1_Video.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
+      if (cfg.CAM2_Video.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM2_Video.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
+      if (cfg.CAM3_Video.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM3_Video.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
+      if (cfg.CAM4_Video.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM4_Video.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
     }
   }
 
@@ -65,7 +106,7 @@ class CamDriver final : public rclcpp::Node {
   }
 
   // SDK 获取图像信息后的回调函数 
-  void ImageCallback1(const void *msg, size_t) const {
+  void ImageCallback(const void *msg, size_t) {
     // 原始的图像数据
     const auto *cam_data = static_cast<const infinite_sense::CamData *>(msg);
     std_msgs::msg::Header header;
@@ -74,8 +115,8 @@ class CamDriver final : public rclcpp::Node {
     header.frame_id = "map";
     // 构造opencv图像，这里是彩色图片因此是 CV_8UC3 和  bgr8
     const cv::Mat image_mat(cam_data->image.rows, cam_data->image.cols, CV_8UC3, cam_data->image.data);
-    const sensor_msgs::msg::Image::SharedPtr image_msg = cv_bridge::CvImage(header, "bgr8", image_mat).toImageMsg();
-    img1_pub_.publish(image_msg);
+    sensor_msgs::msg::Image::SharedPtr image_msg = cv_bridge::CvImage(header, "bgr8", image_mat).toImageMsg();
+    image_pubs_[cam_data->name].publish(image_msg);
   }
 
 
@@ -83,7 +124,8 @@ class CamDriver final : public rclcpp::Node {
   infinite_sense::Synchronizer synchronizer_;
   SharedPtr node_handle_;
   image_transport::ImageTransport transport_;
-  image_transport::Publisher img1_pub_,img2_pub_;
+  std::unordered_map<std::string, image_transport::Publisher> image_pubs_;
+  std::shared_ptr<VideoCam> video_cam_;
   rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_pub_;
 };
 
