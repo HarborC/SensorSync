@@ -29,5 +29,6 @@ class Messenger {
   zmq::socket_t publisher_{}, subscriber_{};
   std::string endpoint_{};
   std::vector<std::thread> sub_threads_;
+  bool use_old_zmq_ = true;
 };
 }  // namespace infinite_sense

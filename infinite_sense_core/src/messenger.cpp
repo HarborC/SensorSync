@@ -4,6 +4,12 @@
 namespace infinite_sense {
 
 Messenger::Messenger() {
+  int major, minor, patch;
+  zmq_version(&major, &minor, &patch);
+  if ((major == 4) && (minor >= 3)) {
+    use_old_zmq_ = false;
+    LOG(INFO) << "Using new ZMQ version: " << major << "." << minor << "." << patch;
+  }
   try {
     endpoint_ = "tcp://127.0.0.1:4565";
     context_ = zmq::context_t(10);
@@ -61,7 +67,11 @@ void Messenger::Sub(const std::string& topic, const std::function<void(const std
     try {
       zmq::socket_t subscriber(context_, zmq::socket_type::sub);
       subscriber.connect(endpoint_);
-      subscriber.set(zmq::sockopt::subscribe, topic);
+      if (use_old_zmq_) {
+        subscriber.setsockopt(ZMQ_SUBSCRIBE, topic.data(), topic.size());
+      } else {
+        subscriber.set(zmq::sockopt::subscribe, topic);
+      }
       while (true) {
         zmq::message_t topic_msg, data_msg;
         if (!subscriber.recv(topic_msg) || !subscriber.recv(data_msg)) {
@@ -87,7 +97,11 @@ void Messenger::SubStruct(const std::string& topic, const std::function<void(con
       auto context = zmq::context_t(1);
       zmq::socket_t subscriber(context, zmq::socket_type::sub);
       subscriber.connect(endpoint_);
-      subscriber.set(zmq::sockopt::subscribe, topic);
+      if (use_old_zmq_) {
+        subscriber.setsockopt(ZMQ_SUBSCRIBE, topic.data(), topic.size());
+      } else {
+        subscriber.set(zmq::sockopt::subscribe, topic);
+      }
       while (true) {
         zmq::message_t topic_msg, data_msg;
         if (!subscriber.recv(topic_msg) || !subscriber.recv(data_msg)) {
