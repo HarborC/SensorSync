@@ -9,7 +9,7 @@ namespace infinite_sense {
 // 继承自 Sensor 类，会自动调用初始化，开始，停止等函数 
 class VideoCam final : public Sensor {
  public:
-  VideoCam(const std::vector<std::pair<std::string, int>>& cam_list);
+  explicit VideoCam(const std::vector<std::pair<std::string, int>>& cam_list);
   ~VideoCam() override;
 
   bool Initialization() override; // 相机初始化函数
