@@ -4,7 +4,7 @@ import struct
 import threading
 import time
 
-from infinite_sense_core.data import process_trigger_data, process_imu_data, process_gps_data, process_log_data
+from .data import process_trigger_data, process_imu_data, process_gps_data, process_log_data
 from .times import precise_sleep
 from .ptp import Ptp
 

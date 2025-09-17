@@ -3,8 +3,8 @@ import threading
 
 import serial
 
-from data import process_trigger_data, process_imu_data, process_gps_data, process_log_data
-from ptp import Ptp
+from .data import process_trigger_data, process_imu_data, process_gps_data, process_log_data
+from .ptp import Ptp
 from .times import precise_sleep
 
 class UsbManager:

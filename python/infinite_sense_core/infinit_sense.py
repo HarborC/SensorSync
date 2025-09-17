@@ -26,13 +26,13 @@ class Synchronizer:
     def set_net_link(self, net_ip, net_port):
         self.net_ip = net_ip
         self.net_port = net_port
-        from infinite_sense_core.net import NetManager
+        from .net import NetManager
         self.net_manager = NetManager(net_ip, net_port)
 
     def set_usb_link(self, serial_dev, serial_baud_rate):
         self.serial_dev = serial_dev
         self.serial_baud_rate = serial_baud_rate
-        from usb import UsbManager
+        from .usb import UsbManager
         self.serial_manager = UsbManager(serial_dev, serial_baud_rate)
         self.net_manager = None
 
