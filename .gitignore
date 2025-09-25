@@ -7,10 +7,14 @@
 *.Release
 *.Debug
 *.exe
-.idea/
+
+
 cmake-build-*/
 .vscode/
 build/
 log/
 .clang-format
 .clang-tidy
+
+#python
+.venv/
