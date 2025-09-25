@@ -13,8 +13,10 @@ cmake-build-*/
 .vscode/
 build/
 log/
+
 .clang-format
 .clang-tidy
 
+.claude/
 #python
 .venv/
