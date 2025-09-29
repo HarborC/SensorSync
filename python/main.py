@@ -20,11 +20,9 @@ def image_callback(msg_bytes, size):
     print(f"Received image data of size {size}")
 
 def main():
-    print("启动 SimpleSensorSync 同步器...")
-
     synchronizer = Synchronizer()
 
-    synchronizer.set_net_link("192.168.1.188", 8888)
+    synchronizer.set_net_link("192.168.192.188", 8888)
 
     sensor = DemoSensor()
 
@@ -35,9 +33,6 @@ def main():
     messenger = Messenger.get_instance()
     messenger.sub("imu_1", imu_callback)
     messenger.sub("cam_1", image_callback)
-
-    print("同步器正在运行，按 Ctrl+C 退出...")
-
     try:
         while True:
             time.sleep(0.1)
@@ -45,7 +40,6 @@ def main():
         print("\n检测到键盘中断，正在停止同步器...")
 
     synchronizer.stop()
-    print("同步器已停止")
 
 if __name__ == "__main__":
     main()
