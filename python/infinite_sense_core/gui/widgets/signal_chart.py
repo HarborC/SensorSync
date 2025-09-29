@@ -21,7 +21,7 @@ from ...data import TriggerEvent
 class SignalChart(QWidget):
     """触发信号图表组件"""
 
-    def __init__(self, max_points: int = 1000):
+    def __init__(self, max_points: int = 10000):
         super().__init__()
         self.max_points = max_points
         self.device_names = ["IMU_1", "IMU_2", "CAM_1", "CAM_2", "CAM_3", "CAM_4", "LASER", "GPS"]
@@ -98,8 +98,8 @@ class SignalChart(QWidget):
         self.plot_widget.setYRange(-0.5, len(self.device_names) - 0.5)
         self.plot_widget.getAxis('left').setTicks([[(i, name) for i, name in enumerate(self.device_names)]])
 
-        # 启用自动范围调整
-        self.plot_widget.enableAutoRange(axis='x')
+        # 禁用自动范围调整，使用手动控制
+        self.plot_widget.enableAutoRange(axis='x', enable=False)
 
         parent_layout.addWidget(self.plot_widget, 1)
 
@@ -153,16 +153,23 @@ class SignalChart(QWidget):
             if device_name in event.triggered_devices:
                 # 设备触发，添加数据点
                 self.signal_data[device_name].append((current_time, i))
-            else:
-                # 设备未触发，添加空数据点（用于保持时间同步）
-                self.signal_data[device_name].append(None)
+            # 注意：不再为未触发的设备添加None值，这样可以避免数据同步问题
 
         self.update_plot()
 
     def update_plot(self):
         """更新图表显示"""
-        current_time = datetime.now().timestamp()
+        if not self.time_data:
+            return
+
+        # 使用数据中的最新时间作为基准，而不是系统当前时间
+        latest_time = max(self.time_data)
         time_window = self.time_window_spin.value()
+        window_start = latest_time - time_window
+
+        # 调试信息 - 可以暂时添加来查看数据状态
+        total_time_points = len(self.time_data)
+        print(f"Debug: 总时间点数={total_time_points}, 最新时间={latest_time:.3f}, 窗口起始={window_start:.3f}")
 
         for device_name, scatter in self.plot_items.items():
             # 获取设备数据
@@ -170,11 +177,15 @@ class SignalChart(QWidget):
 
             # 过滤时间窗口内的数据
             valid_points = []
+            total_device_points = len(device_data)
             for point in device_data:
-                if point is not None:
-                    timestamp, y_value = point
-                    if current_time - timestamp <= time_window:
-                        valid_points.append([timestamp, y_value])
+                timestamp, y_value = point
+                if timestamp >= window_start:
+                    valid_points.append([timestamp, y_value])
+
+            # 调试信息
+            if total_device_points > 0:
+                print(f"设备 {device_name}: 总点数={total_device_points}, 窗口内点数={len(valid_points)}")
 
             if valid_points:
                 valid_points = np.array(valid_points)
@@ -182,10 +193,8 @@ class SignalChart(QWidget):
             else:
                 scatter.setData([], [])
 
-        # 更新X轴范围
-        if self.time_data:
-            latest_time = max(self.time_data)
-            self.plot_widget.setXRange(latest_time - time_window, latest_time)
+        # 更新X轴范围 - 使用数据时间基准
+        self.plot_widget.setXRange(window_start, latest_time)
 
     def highlight_device(self, device_name: str):
         """高亮显示特定设备"""
