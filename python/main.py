@@ -1,40 +1,33 @@
-import logging
 import time
 from infinite_sense_core.infinit_sense import Synchronizer
 from infinite_sense_core.message import Messenger
 
 
-class MockSensor:
+class DemoSensor:
     def initialization(self):
-        logging.info("MockSensor initialized")
+        print("MockSensor initialized")
 
     def start(self):
-        logging.info("MockSensor started")
+        print("MockSensor started")
 
     def stop(self):
-        logging.info("MockSensor stopped")
+        print("MockSensor stopped")
 
 def imu_callback(msg_bytes, size):
-    logging.info(f"Received IMU data of size {size}")
+    print(f"Received IMU data of size {size}")
 
 def image_callback(msg_bytes, size):
-    logging.info(f"Received image data of size {size}")
+    print(f"Received image data of size {size}")
 
 def main():
-    logging.basicConfig(level=logging.INFO,
-                        format='[%(asctime)s] %(levelname)s: %(message)s',
-                        handlers=[
-                            logging.FileHandler("synchronizer.log", mode='a', encoding='utf-8'),
-                            logging.StreamHandler()
-                        ])
+    print("启动 SimpleSensorSync 同步器...")
 
     synchronizer = Synchronizer()
 
-    synchronizer.set_log_path("synchronizer.log")
-
     synchronizer.set_net_link("192.168.1.188", 8888)
 
-    sensor = MockSensor()
+    sensor = DemoSensor()
+
     synchronizer.use_sensor(sensor)
 
     synchronizer.start()
@@ -43,15 +36,16 @@ def main():
     messenger.sub("imu_1", imu_callback)
     messenger.sub("cam_1", image_callback)
 
-    logging.info("Synchronizer is running. Press Ctrl+C to exit.")
+    print("同步器正在运行，按 Ctrl+C 退出...")
 
     try:
         while True:
             time.sleep(0.1)
     except KeyboardInterrupt:
-        logging.info("Stopping synchronizer due to keyboard interrupt...")
+        print("\n检测到键盘中断，正在停止同步器...")
 
     synchronizer.stop()
+    print("同步器已停止")
 
 if __name__ == "__main__":
     main()

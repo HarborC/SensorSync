@@ -7,12 +7,10 @@
 
 import numpy as np
 from collections import deque
-from typing import Dict, List
-from datetime import datetime
 
 import pyqtgraph as pg
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QCheckBox, QSpinBox
-from PyQt6.QtCore import QTimer, Qt, pyqtSignal
+from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 
 from ...data import TriggerEvent
@@ -76,8 +74,8 @@ class SignalChart(QWidget):
         # 时间窗口控制
         time_window_label = QLabel("时间窗口(秒):")
         self.time_window_spin = QSpinBox()
-        self.time_window_spin.setRange(5, 300)
-        self.time_window_spin.setValue(30)
+        self.time_window_spin.setRange(1, 600)
+        self.time_window_spin.setValue(1)
         self.time_window_spin.valueChanged.connect(self.update_time_window)
 
         header_layout.addWidget(time_window_label)
@@ -167,9 +165,6 @@ class SignalChart(QWidget):
         time_window = self.time_window_spin.value()
         window_start = latest_time - time_window
 
-        # 调试信息 - 可以暂时添加来查看数据状态
-        total_time_points = len(self.time_data)
-        print(f"Debug: 总时间点数={total_time_points}, 最新时间={latest_time:.3f}, 窗口起始={window_start:.3f}")
 
         for device_name, scatter in self.plot_items.items():
             # 获取设备数据
@@ -177,15 +172,11 @@ class SignalChart(QWidget):
 
             # 过滤时间窗口内的数据
             valid_points = []
-            total_device_points = len(device_data)
             for point in device_data:
                 timestamp, y_value = point
                 if timestamp >= window_start:
                     valid_points.append([timestamp, y_value])
 
-            # 调试信息
-            if total_device_points > 0:
-                print(f"设备 {device_name}: 总点数={total_device_points}, 窗口内点数={len(valid_points)}")
 
             if valid_points:
                 valid_points = np.array(valid_points)
@@ -217,7 +208,7 @@ class SignalChart(QWidget):
         visible = state == Qt.CheckState.Checked.value
         self.plot_items[device_name].setVisible(visible)
 
-    def update_time_window(self, value: int):
+    def update_time_window(self):
         """更新时间窗口"""
         self.update_plot()
 
@@ -230,38 +221,4 @@ class SignalChart(QWidget):
         for scatter in self.plot_items.values():
             scatter.setData([], [])
 
-    def export_data(self) -> List[Dict]:
-        """导出数据为列表格式"""
-        exported_data = []
 
-        for i, timestamp in enumerate(self.time_data):
-            data_point = {
-                'timestamp': timestamp,
-                'triggered_devices': []
-            }
-
-            for device_name in self.device_names:
-                if i < len(self.signal_data[device_name]):
-                    point = self.signal_data[device_name][i]
-                    if point is not None:
-                        data_point['triggered_devices'].append(device_name)
-
-            exported_data.append(data_point)
-
-        return exported_data
-
-    def get_statistics(self) -> Dict:
-        """获取统计信息"""
-        stats = {
-            'total_events': len(self.time_data),
-            'device_stats': {}
-        }
-
-        for device_name in self.device_names:
-            device_events = sum(1 for point in self.signal_data[device_name] if point is not None)
-            stats['device_stats'][device_name] = {
-                'trigger_count': device_events,
-                'trigger_rate': device_events / max(len(self.time_data), 1)
-            }
-
-        return stats

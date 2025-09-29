@@ -64,10 +64,7 @@ class TriggerProcessor:
         # 调用所有回调函数
         with self._lock:
             for callback in self._callbacks:
-                try:
-                    callback(trigger_event)
-                except Exception as e:
-                    print(f"[ERROR] Trigger callback error: {e}")
+                callback(trigger_event)
 
     def _update_statistics(self, event: TriggerEvent):
         """更新触发统计信息"""
@@ -122,6 +119,3 @@ def process_gps_data(data: Dict):
 def process_log_data(data: Dict):
     if data.get("f") != "log":
         return
-    level = data.get("l", "INFO")
-    msg = data.get("msg", "")
-    print(f"[LOG-{level}] {msg}")

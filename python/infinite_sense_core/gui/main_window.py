@@ -181,19 +181,15 @@ class MainWindow(QMainWindow):
 
     def apply_config(self, config: dict):
         """应用配置"""
-        try:
-            self.synchronizer = Synchronizer()
+        self.synchronizer = Synchronizer()
 
-            if config.get('connection_type') == 'network':
-                self.synchronizer.set_net_link(config['net_ip'], config['net_port'])
-            elif config.get('connection_type') == 'serial':
-                self.synchronizer.set_usb_link(config['serial_device'], config['serial_baudrate'])
+        if config.get('connection_type') == 'network':
+            self.synchronizer.set_net_link(config['net_ip'], config['net_port'])
+        elif config.get('connection_type') == 'serial':
+            self.synchronizer.set_usb_link(config['serial_device'], config['serial_baudrate'])
 
-            self.status_bar.showMessage("配置已应用 - 可以开始监控")
-            self.start_action.setEnabled(True)
-
-        except Exception as e:
-            self.status_bar.showMessage(f"配置错误: {str(e)}")
+        self.status_bar.showMessage("配置已应用 - 可以开始监控")
+        self.start_action.setEnabled(True)
 
     def start_monitoring(self):
         """开始监控"""
@@ -201,24 +197,16 @@ class MainWindow(QMainWindow):
             self.status_bar.showMessage("请先配置连接参数")
             return
 
-        try:
-            self.synchronizer.start()
-            self._is_monitoring = True
-            self.connection_status_changed.emit(True)
-
-        except Exception as e:
-            self.status_bar.showMessage(f"启动监控失败: {str(e)}")
+        self.synchronizer.start()
+        self._is_monitoring = True
+        self.connection_status_changed.emit(True)
 
     def stop_monitoring(self):
         """停止监控"""
         if self.synchronizer and self._is_monitoring:
-            try:
-                self.synchronizer.stop()
-                self._is_monitoring = False
-                self.connection_status_changed.emit(False)
-
-            except Exception as e:
-                self.status_bar.showMessage(f"停止监控失败: {str(e)}")
+            self.synchronizer.stop()
+            self._is_monitoring = False
+            self.connection_status_changed.emit(False)
 
     def closeEvent(self, event):
         """窗口关闭事件"""

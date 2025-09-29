@@ -6,7 +6,7 @@ LED风格的圆形指示器，显示设备触发状态
 """
 
 from PyQt6.QtWidgets import QWidget
-from PyQt6.QtCore import QTimer, QPropertyAnimation, QEasingCurve, pyqtProperty, Qt
+from PyQt6.QtCore import QTimer, Qt
 from PyQt6.QtGui import QPainter, QColor, QBrush, QPen
 from PyQt6.QtCore import QRectF
 
@@ -39,21 +39,7 @@ class TriggerIndicator(QWidget):
         self.blink_timer = QTimer()
         self.blink_timer.timeout.connect(self.reset_trigger_state)
 
-        # 淡入淡出动画
-        self.fade_animation = QPropertyAnimation(self, b"opacity")
-        self.fade_animation.setDuration(200)
-        self.fade_animation.setEasingCurve(QEasingCurve.Type.InOutQuad)
 
-    @pyqtProperty(float)
-    def opacity(self):
-        """透明度属性"""
-        return self._opacity
-
-    @opacity.setter
-    def opacity(self, value):
-        """设置透明度"""
-        self._opacity = value
-        self.update()
 
     def set_triggered(self, triggered: bool):
         """设置触发状态"""
@@ -132,25 +118,4 @@ class TriggerIndicator(QWidget):
         self.setFixedSize(size, size)
         self.update()
 
-    def start_fade_in(self):
-        """淡入动画"""
-        self.fade_animation.setStartValue(0.0)
-        self.fade_animation.setEndValue(1.0)
-        self.fade_animation.start()
 
-    def start_fade_out(self):
-        """淡出动画"""
-        self.fade_animation.setStartValue(1.0)
-        self.fade_animation.setEndValue(0.3)
-        self.fade_animation.start()
-
-    def enterEvent(self, event):
-        """鼠标进入事件"""
-        self.start_fade_in()
-        super().enterEvent(event)
-
-    def leaveEvent(self, event):
-        """鼠标离开事件"""
-        if not self.is_triggered:
-            self.start_fade_out()
-        super().leaveEvent(event)

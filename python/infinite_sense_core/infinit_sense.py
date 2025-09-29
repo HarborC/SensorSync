@@ -19,9 +19,6 @@ class Synchronizer:
                      "    █  ▐▌ ▝▜▌▐▛▀▀▘  █  ▐▌ ▝▜▌  █    █  ▐▛▀▀▘ ▝▀▚▖▐▛▀▀▘▐▌ ▝▜▌ ▝▀▚▖▐▛▀▀▘\n"
                      "  ▗▄█▄▖▐▌  ▐▌▐▌   ▗▄█▄▖▐▌  ▐▌▗▄█▄▖  █  ▐▙▄▄▖▗▄▄▞▘▐▙▄▄▖▐▌  ▐▌▗▄▄▞▘▐▙▄▄▖")
 
-    def set_log_path(self, path):
-        logging.basicConfig(filename=path, level=logging.INFO,
-                            format='[%(asctime)s] %(levelname)s: %(message)s')
 
     def set_net_link(self, net_ip, net_port):
         self.net_ip = net_ip

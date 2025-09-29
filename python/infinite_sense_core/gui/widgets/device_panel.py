@@ -79,14 +79,7 @@ class DeviceStatusWidget(QFrame):
         """更新统计信息显示"""
         stats = get_trigger_processor().get_device_stats(self.device_name)
         self.trigger_count = stats.get('trigger_count', 0)
-        last_time = stats.get('last_trigger_time', 0)
-
-        if last_time > 0:
-            from datetime import datetime
-            time_str = datetime.fromtimestamp(last_time / 1_000_000).strftime("%H:%M:%S")
-            self.stats_label.setText(f"计数: {self.trigger_count} | 最后: {time_str}")
-        else:
-            self.stats_label.setText(f"计数: {self.trigger_count} | 最后: 无")
+        self.stats_label.setText(f"计数: {self.trigger_count}")
 
     def set_selected(self, selected: bool):
         """设置选中状态"""
@@ -190,29 +183,15 @@ class DevicePanel(QWidget):
     def update_summary_stats(self):
         """更新总体统计信息"""
         trigger_processor = get_trigger_processor()
-
         total_triggers = 0
         active_devices = 0
-        last_activity_time = 0
 
         for device_name in self.device_widgets.keys():
-            stats = trigger_processor.get_device_stats(device_name)
-            count = stats.get('trigger_count', 0)
-            last_time = stats.get('last_trigger_time', 0)
-
+            count = trigger_processor.get_device_stats(device_name).get('trigger_count', 0)
             total_triggers += count
             if count > 0:
                 active_devices += 1
-            if last_time > last_activity_time:
-                last_activity_time = last_time
 
-        # 更新显示
         self.total_triggers_label.setText(f"总触发次数: {total_triggers}")
         self.active_devices_label.setText(f"活跃设备: {active_devices}")
-
-        if last_activity_time > 0:
-            from datetime import datetime
-            time_str = datetime.fromtimestamp(last_activity_time / 1_000_000).strftime("%H:%M:%S")
-            self.last_activity_label.setText(f"最后活动: {time_str}")
-        else:
-            self.last_activity_label.setText("最后活动: 无")
+        self.last_activity_label.setText("最后活动: 实时更新")
