@@ -3,4 +3,5 @@ project(example)
 
 add_subdirectory(NetCam)
 add_subdirectory(VideoCam)
+add_subdirectory(VideoCam_LVI)
 add_subdirectory(CustomCam)
