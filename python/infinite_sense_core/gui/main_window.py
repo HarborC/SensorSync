@@ -41,7 +41,7 @@ class MainWindow(QMainWindow):
 
     def init_ui(self):
         """初始化用户界面"""
-        self.setWindowTitle("SimpleSensorSync - 多传感器同步监控")
+        self.setWindowTitle("SimpleSensorSync")
         self.setGeometry(100, 100, 1200, 800)
 
         # 创建菜单栏
@@ -58,7 +58,7 @@ class MainWindow(QMainWindow):
         menubar = self.menuBar()
 
         # 文件菜单
-        file_menu = menubar.addMenu('文件(&F)')
+        file_menu = menubar.addMenu('设置(&F)')
 
         # 连接配置
         config_action = QAction('连接配置(&C)', self)
