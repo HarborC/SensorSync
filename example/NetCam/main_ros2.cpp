@@ -8,31 +8,71 @@
 
 #include <sensor_msgs/msg/imu.hpp>
 
+struct cam_config {
+    bool onboard_imu = true;// 使用内部IMU
+    bool extern_imu = false;// 使用外部IMU,TODO 
+    std::string imu_name = "onboard_imu";
+
+    // 相机名称 + 设备ID
+    std::pair<std::string, int> CAM1 = {"cam_1", 1};
+    std::pair<std::string, int> CAM2 = {"cam_2", -1};
+    std::pair<std::string, int> CAM3 = {"cam_3", -1};
+    std::pair<std::string, int> CAM4 = {"cam_4", -1}; // -1 代表没有
+
+    // 通信方式
+    int type = 0; // 0 --> 串口通信  1 --> 网口通信
+    std::string uart_dev = "/dev/ttyACM0";
+    std::string net_ip = "192.168.1.188";
+    int net_port = 8888;
+};
+cam_config cfg;
+
+using namespace infinite_sense;
+
 class CamDriver final : public rclcpp::Node {
  public:
   CamDriver()
       : Node("ros2_cam_driver"), node_handle_(std::shared_ptr<CamDriver>(this, [](auto *) {})), transport_(node_handle_) {
-    std::string camera_name_1 = "cam_1";
-    std::string camera_name_2 = "cam_2";
-    const std::string imu_name = "imu_1";
-    // synchronizer_.SetUsbLink("/dev/ttyACM0", 921600);
-    synchronizer_.SetNetLink("192.168.1.188", 8888);
-    const auto mv_cam = std::make_shared<infinite_sense::MvCam>();
-    mv_cam->SetParams({{camera_name_1, infinite_sense::CAM_1},
-                          {camera_name_2, infinite_sense::CAM_2},
-    });
-    synchronizer_.UseSensor(mv_cam);
+
+    if (cfg.type == 0) {
+      synchronizer_.SetUsbLink(cfg.uart_dev, 921600);
+    } else if (cfg.type == 1) {
+      synchronizer_.SetNetLink(cfg.net_ip, cfg.net_port);
+    }
+
+    mv_cam_ = std::make_shared<infinite_sense::MvCam>();
+
+    if (cfg.CAM1.second >= 0) mv_cam_->SetParams({{cfg.CAM1.first, CAM_1}});
+    if (cfg.CAM2.second >= 0) mv_cam_->SetParams({{cfg.CAM2.first, CAM_2}});
+    if (cfg.CAM3.second >= 0) mv_cam_->SetParams({{cfg.CAM3.first, CAM_3}});
+    if (cfg.CAM4.second >= 0) mv_cam_->SetParams({{cfg.CAM4.first, CAM_4}});
+
+
+    if (cfg.CAM1.second >= 0) image_pubs_[cfg.CAM1.first] = transport_.advertise(cfg.CAM1.first, 30);
+    if (cfg.CAM2.second >= 0) image_pubs_[cfg.CAM2.first] = transport_.advertise(cfg.CAM2.first, 30);
+    if (cfg.CAM3.second >= 0) image_pubs_[cfg.CAM3.first] = transport_.advertise(cfg.CAM3.first, 30);
+    if (cfg.CAM4.second >= 0) image_pubs_[cfg.CAM4.first] = transport_.advertise(cfg.CAM4.first, 30);
+
+    synchronizer_.UseSensor(mv_cam_);
     synchronizer_.Start();
-    imu_pub_ = this->create_publisher<sensor_msgs::msg::Imu>(imu_name, 10);
-    img1_pub_ = transport_.advertise(camera_name_1, 10);
-    img2_pub_ = transport_.advertise(camera_name_2, 10);
+
+    if (cfg.onboard_imu) {
+      imu_pub_ = this->create_publisher<sensor_msgs::msg::Imu>(cfg.imu_name, 10);
+      Messenger::GetInstance().SubStruct(
+          cfg.imu_name, std::bind(&CamDriver::ImuCallback, this, std::placeholders::_1, std::placeholders::_2));
+    }
+
     {
       using namespace std::placeholders;
-      infinite_sense::Messenger::GetInstance().SubStruct(imu_name, std::bind(&CamDriver::ImuCallback, this, _1, _2));
-      infinite_sense::Messenger::GetInstance().SubStruct(camera_name_1,
-                                                         std::bind(&CamDriver::ImageCallback1, this, _1, _2));
-      infinite_sense::Messenger::GetInstance().SubStruct(camera_name_2,
-                                                         std::bind(&CamDriver::ImageCallback2, this, _1, _2));
+      if (cfg.onboard_imu) {
+          Messenger::GetInstance().SubStruct(
+          cfg.imu_name, std::bind(&CamDriver::ImuCallback, this, std::placeholders::_1, std::placeholders::_2));
+      }
+
+      if (cfg.CAM1.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM1.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
+      if (cfg.CAM2.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM2.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
+      if (cfg.CAM3.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM3.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
+      if (cfg.CAM4.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM4.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
     }
   }
 
@@ -54,24 +94,14 @@ class CamDriver final : public rclcpp::Node {
     imu_pub_->publish(imu_msg);
   }
 
-  void ImageCallback1(const void *msg, size_t) const {
+  void ImageCallback(const void *msg, size_t) {
     const auto *cam_data = static_cast<const infinite_sense::CamData *>(msg);
     std_msgs::msg::Header header;
     header.stamp = rclcpp::Time(cam_data->time_stamp_us * 1000);
     header.frame_id = "map";
     const cv::Mat image_mat(cam_data->image.rows, cam_data->image.cols, CV_8UC1, cam_data->image.data);
     const sensor_msgs::msg::Image::SharedPtr image_msg = cv_bridge::CvImage(header, "mono8", image_mat).toImageMsg();
-    img1_pub_.publish(image_msg);
-  }
-
-  void ImageCallback2(const void *msg, size_t) const {
-    const auto *cam_data = static_cast<const infinite_sense::CamData *>(msg);
-    std_msgs::msg::Header header;
-    header.stamp = rclcpp::Time(cam_data->time_stamp_us * 1000);
-    header.frame_id = "map";
-    const cv::Mat image_mat(cam_data->image.rows, cam_data->image.cols, CV_8UC1, cam_data->image.data);
-    const sensor_msgs::msg::Image::SharedPtr image_msg = cv_bridge::CvImage(header, "mono8", image_mat).toImageMsg();
-    img2_pub_.publish(image_msg);
+    image_pubs_[cam_data->name].publish(image_msg);
   }
 
 
@@ -79,7 +109,8 @@ class CamDriver final : public rclcpp::Node {
   infinite_sense::Synchronizer synchronizer_;
   SharedPtr node_handle_;
   image_transport::ImageTransport transport_;
-  image_transport::Publisher img1_pub_,img2_pub_;
+  std::shared_ptr<MvCam> mv_cam_;
+  std::unordered_map<std::string, image_transport::Publisher> image_pubs_;
   rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_pub_;
 };
 

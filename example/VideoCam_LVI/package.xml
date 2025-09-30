@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>video_cam</name>
+  <name>video_cam_lvi</name>
   <version>1.0.0</version>
   <description>The infinite sense camera package</description>
   <maintainer email="www.qq837374741@foxmail.com">infinite sense</maintainer>

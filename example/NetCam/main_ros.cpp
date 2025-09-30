@@ -6,6 +6,26 @@
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/Imu.h>
 
+
+struct cam_config {
+    bool onboard_imu = true;// 使用内部IMU
+    bool extern_imu = false;// 使用外部IMU,TODO 
+    std::string imu_name = "onboard_imu";
+
+    // 相机名称 + 设备ID
+    std::pair<std::string, int> CAM1 = {"cam_1", 1};
+    std::pair<std::string, int> CAM2 = {"cam_2", -1};
+    std::pair<std::string, int> CAM3 = {"cam_3", -1};
+    std::pair<std::string, int> CAM4 = {"cam_4", -1}; // -1 代表没有
+
+    // 通信方式
+    int type = 0; // 0 --> 串口通信  1 --> 网口通信
+    std::string uart_dev = "/dev/ttyACM0";
+    std::string net_ip = "192.168.1.188";
+    int net_port = 8888;
+};
+cam_config cfg;
+
 using namespace infinite_sense;
 inline ros::Time CreateRosTimestamp(const uint64_t mico_sec) {
   uint32_t nsec_per_second = 1e9;
@@ -47,21 +67,45 @@ class CamDriver {
         // mono8:灰度类型,bgr8:彩图，具体需要根据相机类型进行修改
         cv_bridge::CvImage(std_msgs::Header(), "mono8", image_mat).toImageMsg();
     image_msg->header.stamp = CreateRosTimestamp(cam_data->time_stamp_us);
-    image_pub_.publish(image_msg);
+    image_pubs_[cam_data->name].publish(image_msg);
   }
   void Init() {
-    synchronizer_.SetUsbLink("/dev/ttyACM0", 921600);
+    if (cfg.type == 0) {
+      synchronizer_.SetUsbLink(cfg.uart_dev, 921600);
+    } else if (cfg.type == 1) {
+      synchronizer_.SetNetLink(cfg.net_ip, cfg.net_port);
+    }
+  
     mv_cam_ = std::make_shared<MvCam>();
-    mv_cam_->SetParams({{"cam_1", CAM_1}});
     synchronizer_.UseSensor(mv_cam_);
-    imu_pub_ = node_.advertise<sensor_msgs::Imu>(imu_name_, 1000);
-    image_pub_ = it_.advertise(camera_name_, 30);
+
+    if (cfg.onboard_imu) {
+      imu_pub_ = node_.advertise<sensor_msgs::Imu>(cfg.imu_name, 1000);
+    }
+
+    if (cfg.CAM1.second >= 0) mv_cam_->SetParams({{cfg.CAM1.first, CAM_1}});
+    if (cfg.CAM2.second >= 0) mv_cam_->SetParams({{cfg.CAM2.first, CAM_2}});
+    if (cfg.CAM3.second >= 0) mv_cam_->SetParams({{cfg.CAM3.first, CAM_3}});
+    if (cfg.CAM4.second >= 0) mv_cam_->SetParams({{cfg.CAM4.first, CAM_4}});
+
+
+    if (cfg.CAM1.second >= 0) image_pubs_[cfg.CAM1.first] = it_.advertise(cfg.CAM1.first, 30);
+    if (cfg.CAM2.second >= 0) image_pubs_[cfg.CAM2.first] = it_.advertise(cfg.CAM2.first, 30);
+    if (cfg.CAM3.second >= 0) image_pubs_[cfg.CAM3.first] = it_.advertise(cfg.CAM3.first, 30);
+    if (cfg.CAM4.second >= 0) image_pubs_[cfg.CAM4.first] = it_.advertise(cfg.CAM4.first, 30);
+
     synchronizer_.Start();
     std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-    Messenger::GetInstance().SubStruct(
-        "imu_1", std::bind(&CamDriver::ImuCallback, this, std::placeholders::_1, std::placeholders::_2));
-    Messenger::GetInstance().SubStruct(
-        "cam_1", std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
+
+    if (cfg.onboard_imu) {
+      Messenger::GetInstance().SubStruct(
+          cfg.imu_name, std::bind(&CamDriver::ImuCallback, this, std::placeholders::_1, std::placeholders::_2));
+    }
+
+    if (cfg.CAM1.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM1.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
+    if (cfg.CAM2.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM2.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
+    if (cfg.CAM3.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM3.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
+    if (cfg.CAM4.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM4.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
   }
 
   void Run() {
@@ -77,7 +121,7 @@ class CamDriver {
   ros::NodeHandle &node_;
   ros::Publisher imu_pub_;
   image_transport::ImageTransport it_;
-  image_transport::Publisher image_pub_;
+  std::unordered_map<std::string, image_transport::Publisher> image_pubs_;
   std::shared_ptr<MvCam> mv_cam_;
   Synchronizer synchronizer_;
   std::string camera_name_;

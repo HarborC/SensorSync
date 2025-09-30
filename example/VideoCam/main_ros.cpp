@@ -110,15 +110,15 @@ class CamDriver {
     synchronizer_.Start();
     std::this_thread::sleep_for(std::chrono::milliseconds(5000));
     
-
-    Messenger::GetInstance().SubStruct(
-        cfg.imu_name, std::bind(&CamDriver::ImuCallback, this, std::placeholders::_1, std::placeholders::_2));
-
+    if (cfg.onboard_imu) {
+      Messenger::GetInstance().SubStruct(
+          cfg.imu_name, std::bind(&CamDriver::ImuCallback, this, std::placeholders::_1, std::placeholders::_2));
+    }
 
     if (cfg.CAM1_Video.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM1_Video.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
-    if (cfg.CAM2_Video.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM1_Video.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
-    if (cfg.CAM3_Video.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM1_Video.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
-    if (cfg.CAM4_Video.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM1_Video.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
+    if (cfg.CAM2_Video.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM2_Video.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
+    if (cfg.CAM3_Video.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM3_Video.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
+    if (cfg.CAM4_Video.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM4_Video.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
   }
 
   void Run() {

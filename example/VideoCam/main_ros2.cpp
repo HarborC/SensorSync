@@ -74,8 +74,10 @@ class CamDriver final : public rclcpp::Node {
 
     // SDK 获取IMU和图像信息之后的回调函数 
     {
-      Messenger::GetInstance().SubStruct(
-        cfg.imu_name, std::bind(&CamDriver::ImuCallback, this, std::placeholders::_1, std::placeholders::_2));
+      if (cfg.onboard_imu) {
+        Messenger::GetInstance().SubStruct(
+          cfg.imu_name, std::bind(&CamDriver::ImuCallback, this, std::placeholders::_1, std::placeholders::_2));
+      }
 
       if (cfg.CAM1_Video.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM1_Video.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
       if (cfg.CAM2_Video.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM2_Video.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
