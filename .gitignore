@@ -1,6 +1,5 @@
 .idea/
 *build*
-*release*
 *debug*
 *bin*
 *.user
