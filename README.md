@@ -12,11 +12,13 @@
 
 # 🚀 [一个简单易用的多传感器同步方案](https://github.com/InfiniteSenseLab/SimpleSensorSync/wiki)！  
    多传感器的时间同步是一个很重要的问题，尤其对多传感器融合系统。不正确的时间同步会导致数据融合错误，影响系统性能。 对大多数研究人员来说，这是一个底层又复杂的问题，却不是他们的研究方向。更多的精力应该放在设计传感器融合算法上，而不是在时间同步上。因此，我们设计了这样一个系统，让时间同步不再是一件难事。  
+   
 <p align="center">
   <img alt="Image 1" src="assets/picture/v4_board.png" width="45%">
   &nbsp;&nbsp;&nbsp;
   <img alt="Image 2" src="assets/picture/link/all_sensor.png" width="45%">
 </p>   
+
 ---
 ✨ 精简依赖 – 降低编译开销，构建更快速。  
 🤖 支持 ROS2 & Python – 轻松集成现代机器人与脚本化工作流。  
