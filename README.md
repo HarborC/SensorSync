@@ -38,7 +38,7 @@
 >3. Python版本SDK发布，同步可视化工具发布。
 
 <p align="center">
-  <img alt="tool" src="https://github.com/user-attachments/assets/6787bf44-0433-4cee-9843-9e48ebab3e41" width="45%">
+  <img alt="tool" src="https://github.com/user-attachments/assets/6787bf44-0433-4cee-9843-9e48ebab3e41" width="60%">
 </p> 
 
 # 支持设备
