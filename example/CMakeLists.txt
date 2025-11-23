@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(example)
 
 add_subdirectory(NetCam)
+add_subdirectory(NetCam_LVI)
 add_subdirectory(VideoCam)
 add_subdirectory(VideoCam_LVI)
 add_subdirectory(CustomCam)
