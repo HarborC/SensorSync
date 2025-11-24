@@ -6,23 +6,22 @@
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/Imu.h>
 
-
 struct cam_config {
-    bool onboard_imu = true;// 使用内部IMU
-    bool extern_imu = false;// 使用外部IMU,TODO 
-    std::string imu_name = "onboard_imu";
+  bool onboard_imu = true;  // 使用内部IMU
+  bool extern_imu = false;  // 使用外部IMU,TODO
+  std::string imu_name = "onboard_imu";
 
-    // 相机名称 + 设备ID
-    std::pair<std::string, int> CAM1 = {"cam_1", 1};
-    std::pair<std::string, int> CAM2 = {"cam_2", -1};
-    std::pair<std::string, int> CAM3 = {"cam_3", -1};
-    std::pair<std::string, int> CAM4 = {"cam_4", -1}; // -1 代表没有
+  // 相机名称 + 设备ID
+  std::pair<std::string, int> CAM1 = {"cam_1", 1};
+  std::pair<std::string, int> CAM2 = {"cam_2", -1};
+  std::pair<std::string, int> CAM3 = {"cam_3", -1};
+  std::pair<std::string, int> CAM4 = {"cam_4", -1};  // -1 代表没有
 
-    // 通信方式
-    int type = 0; // 0 --> 串口通信  1 --> 网口通信
-    std::string uart_dev = "/dev/ttyACM0";
-    std::string net_ip = "192.168.1.188";
-    int net_port = 8888;
+  // 通信方式
+  int type = 0;  // 0 --> 串口通信  1 --> 网口通信
+  std::string uart_dev = "/dev/ttyACM0";
+  std::string net_ip = "192.168.1.188";
+  int net_port = 8888;
 };
 cam_config cfg;
 
@@ -75,7 +74,7 @@ class CamDriver {
     } else if (cfg.type == 1) {
       synchronizer_.SetNetLink(cfg.net_ip, cfg.net_port);
     }
-  
+
     mv_cam_ = std::make_shared<MvCam>();
     synchronizer_.UseSensor(mv_cam_);
 
@@ -87,7 +86,6 @@ class CamDriver {
     if (cfg.CAM2.second >= 0) mv_cam_->SetParams({{cfg.CAM2.first, CAM_2}});
     if (cfg.CAM3.second >= 0) mv_cam_->SetParams({{cfg.CAM3.first, CAM_3}});
     if (cfg.CAM4.second >= 0) mv_cam_->SetParams({{cfg.CAM4.first, CAM_4}});
-
 
     if (cfg.CAM1.second >= 0) image_pubs_[cfg.CAM1.first] = it_.advertise(cfg.CAM1.first, 30);
     if (cfg.CAM2.second >= 0) image_pubs_[cfg.CAM2.first] = it_.advertise(cfg.CAM2.first, 30);
@@ -102,10 +100,18 @@ class CamDriver {
           cfg.imu_name, std::bind(&CamDriver::ImuCallback, this, std::placeholders::_1, std::placeholders::_2));
     }
 
-    if (cfg.CAM1.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM1.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
-    if (cfg.CAM2.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM2.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
-    if (cfg.CAM3.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM3.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
-    if (cfg.CAM4.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM4.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
+    if (cfg.CAM1.second >= 0)
+      Messenger::GetInstance().SubStruct(
+          cfg.CAM1.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
+    if (cfg.CAM2.second >= 0)
+      Messenger::GetInstance().SubStruct(
+          cfg.CAM2.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
+    if (cfg.CAM3.second >= 0)
+      Messenger::GetInstance().SubStruct(
+          cfg.CAM3.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
+    if (cfg.CAM4.second >= 0)
+      Messenger::GetInstance().SubStruct(
+          cfg.CAM4.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
   }
 
   void Run() {

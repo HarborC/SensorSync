@@ -18,7 +18,7 @@ void ImageCallback(const void *msg, size_t) {
   // 处理图像数据
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   // 1.创建同步器
   Synchronizer synchronizer;
 
@@ -35,8 +35,7 @@ int main(int argc, char* argv[]) {
       std::cout << "参数为 net，使用网口 192.168.1.188:8888" << std::endl;
       synchronizer.SetNetLink("192.168.1.188", 8888);
     } else {
-      std::cerr << "未知参数: " << mode 
-                << "，请使用 uart / net 或不传参数" << std::endl;
+      std::cerr << "未知参数: " << mode << "，请使用 uart / net 或不传参数" << std::endl;
       return -1;
     }
   }

@@ -9,21 +9,21 @@
 #include <sensor_msgs/msg/imu.hpp>
 
 struct cam_config {
-    bool onboard_imu = true;// 使用内部IMU
-    bool extern_imu = false;// 使用外部IMU,TODO 
-    std::string imu_name = "onboard_imu";
+  bool onboard_imu = true;  // 使用内部IMU
+  bool extern_imu = false;  // 使用外部IMU,TODO
+  std::string imu_name = "onboard_imu";
 
-    // 相机名称 + 设备ID
-    std::pair<std::string, int> CAM1 = {"cam_1", 1};
-    std::pair<std::string, int> CAM2 = {"cam_2", -1};
-    std::pair<std::string, int> CAM3 = {"cam_3", -1};
-    std::pair<std::string, int> CAM4 = {"cam_4", -1}; // -1 代表没有
+  // 相机名称 + 设备ID
+  std::pair<std::string, int> CAM1 = {"cam_1", 1};
+  std::pair<std::string, int> CAM2 = {"cam_2", -1};
+  std::pair<std::string, int> CAM3 = {"cam_3", -1};
+  std::pair<std::string, int> CAM4 = {"cam_4", -1};  // -1 代表没有
 
-    // 通信方式
-    int type = 0; // 0 --> 串口通信  1 --> 网口通信
-    std::string uart_dev = "/dev/ttyACM0";
-    std::string net_ip = "192.168.1.188";
-    int net_port = 8888;
+  // 通信方式
+  int type = 0;  // 0 --> 串口通信  1 --> 网口通信
+  std::string uart_dev = "/dev/ttyACM0";
+  std::string net_ip = "192.168.1.188";
+  int net_port = 8888;
 };
 cam_config cfg;
 
@@ -32,8 +32,9 @@ using namespace infinite_sense;
 class CamDriver final : public rclcpp::Node {
  public:
   CamDriver()
-      : Node("ros2_cam_driver"), node_handle_(std::shared_ptr<CamDriver>(this, [](auto *) {})), transport_(node_handle_) {
-
+      : Node("ros2_cam_driver"),
+        node_handle_(std::shared_ptr<CamDriver>(this, [](auto *) {})),
+        transport_(node_handle_) {
     if (cfg.type == 0) {
       synchronizer_.SetUsbLink(cfg.uart_dev, 921600);
     } else if (cfg.type == 1) {
@@ -46,7 +47,6 @@ class CamDriver final : public rclcpp::Node {
     if (cfg.CAM2.second >= 0) mv_cam_->SetParams({{cfg.CAM2.first, CAM_2}});
     if (cfg.CAM3.second >= 0) mv_cam_->SetParams({{cfg.CAM3.first, CAM_3}});
     if (cfg.CAM4.second >= 0) mv_cam_->SetParams({{cfg.CAM4.first, CAM_4}});
-
 
     if (cfg.CAM1.second >= 0) image_pubs_[cfg.CAM1.first] = transport_.advertise(cfg.CAM1.first, 30);
     if (cfg.CAM2.second >= 0) image_pubs_[cfg.CAM2.first] = transport_.advertise(cfg.CAM2.first, 30);
@@ -65,14 +65,22 @@ class CamDriver final : public rclcpp::Node {
     {
       using namespace std::placeholders;
       if (cfg.onboard_imu) {
-          Messenger::GetInstance().SubStruct(
-          cfg.imu_name, std::bind(&CamDriver::ImuCallback, this, std::placeholders::_1, std::placeholders::_2));
+        Messenger::GetInstance().SubStruct(
+            cfg.imu_name, std::bind(&CamDriver::ImuCallback, this, std::placeholders::_1, std::placeholders::_2));
       }
 
-      if (cfg.CAM1.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM1.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
-      if (cfg.CAM2.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM2.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
-      if (cfg.CAM3.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM3.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
-      if (cfg.CAM4.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM4.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
+      if (cfg.CAM1.second >= 0)
+        Messenger::GetInstance().SubStruct(
+            cfg.CAM1.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
+      if (cfg.CAM2.second >= 0)
+        Messenger::GetInstance().SubStruct(
+            cfg.CAM2.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
+      if (cfg.CAM3.second >= 0)
+        Messenger::GetInstance().SubStruct(
+            cfg.CAM3.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
+      if (cfg.CAM4.second >= 0)
+        Messenger::GetInstance().SubStruct(
+            cfg.CAM4.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
     }
   }
 
@@ -103,7 +111,6 @@ class CamDriver final : public rclcpp::Node {
     const sensor_msgs::msg::Image::SharedPtr image_msg = cv_bridge::CvImage(header, "mono8", image_mat).toImageMsg();
     image_pubs_[cam_data->name].publish(image_msg);
   }
-
 
  private:
   infinite_sense::Synchronizer synchronizer_;

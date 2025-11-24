@@ -2,12 +2,11 @@
 #include "infinite_sense.h"
 #include "MvCameraControl.h"
 #include <opencv2/opencv.hpp>
-#include <sys/mman.h>   // mmap, PROT_READ, PROT_WRITE, MAP_SHARED 等
+#include <sys/mman.h>  // mmap, PROT_READ, PROT_WRITE, MAP_SHARED 等
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>      // open, O_RDWR, O_CREAT 等
-#include <unistd.h>     // close, ftruncate
-
+#include <fcntl.h>   // open, O_RDWR, O_CREAT 等
+#include <unistd.h>  // close, ftruncate
 
 namespace infinite_sense {
 
@@ -68,7 +67,6 @@ bool IsBayerGB8(const MvGvspPixelType type) {
   }
 }
 
-
 bool PrintDeviceInfo(const MV_CC_DEVICE_INFO *info) {
   if (info == nullptr) {
     LOG(WARNING) << "[WARNING] Failed to get camera details. Skipping...";
@@ -98,16 +96,14 @@ bool PrintDeviceInfo(const MV_CC_DEVICE_INFO *info) {
 MvCam::~MvCam() { Stop(); }
 
 bool MvCam::Initialization() {
-
   // TODO2: 获取共享内存文件指针，相机类初始化时调用
-	const char *user_name = getlogin();
-	std::string path_for_time_stamp = "/home/" + std::string(user_name) + "/timeshare";
-	const char *shared_file_name = path_for_time_stamp.c_str();
+  const char *user_name = getlogin();
+  const std::string path_for_time_stamp = "/home/" + std::string(user_name) + "/timeshare";
+  const char *shared_file_name = path_for_time_stamp.c_str();
 
-	int fd = open(shared_file_name, O_RDWR);
+  const int fd = open(shared_file_name, O_RDWR);
 
-	pointt = (time_stamp *)mmap(NULL, sizeof(time_stamp), PROT_READ | PROT_WRITE,
-	                            MAP_SHARED, fd, 0);
+  pointt = static_cast<time_stamp *>(mmap(nullptr, sizeof(time_stamp), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0));
 
   int n_ret = MV_OK;
   MV_CC_DEVICE_INFO_LIST st_device_list{};
@@ -236,14 +232,13 @@ void MvCam::Receive(void *handle, const std::string &name) {
           LOG(ERROR) << "Trigger cam: " << name << " not found!";
         }
       }
-      
+
       // TODO3: 获取当前时间戳信息
-		  if(pointt != MAP_FAILED && pointt->low != 0)
-		  {
-			  // 赋值共享内存中的时间戳给相机帧
-		    cam_data.time_stamp_us = pointt->low;
+      if (pointt != MAP_FAILED && pointt->low != 0) {
+        // 赋值共享内存中的时间戳给相机帧
+        cam_data.time_stamp_us = pointt->low;
         // LOG(INFO) << "time_stamp_s: " << cam_data.time_stamp_us/1000000 << " not found!";
-		  }
+      }
 
       MvGvspPixelType en_dst_pixel_type = PixelType_Gvsp_Undefined;
       unsigned int n_channel_num = 0;
@@ -256,17 +251,18 @@ void MvCam::Receive(void *handle, const std::string &name) {
       else if (IsMono(st_out_frame.stFrameInfo.enPixelType)) {
         n_channel_num = 1;
         en_dst_pixel_type = PixelType_Gvsp_Mono8;
-      }
-      else if (IsBayerGB8(st_out_frame.stFrameInfo.enPixelType)) {
+      } else if (IsBayerGB8(st_out_frame.stFrameInfo.enPixelType)) {
         n_channel_num = 1;
         en_dst_pixel_type = PixelType_Gvsp_BayerGB8;
       }
       if (n_channel_num != 0) {
         cam_data.name = name;
         if (en_dst_pixel_type == PixelType_Gvsp_BayerGB8) {
-          cv::Mat cv_image = cv::Mat(st_out_frame.stFrameInfo.nHeight, st_out_frame.stFrameInfo.nWidth,CV_8UC1, st_out_frame.pBufAddr);
+          auto cv_image = cv::Mat(st_out_frame.stFrameInfo.nHeight, st_out_frame.stFrameInfo.nWidth, CV_8UC1,
+                                  st_out_frame.pBufAddr);
           cv::cvtColor(cv_image, out_image, cv::COLOR_BayerBG2GRAY);
-          cam_data.image = GMat(st_out_frame.stFrameInfo.nHeight, st_out_frame.stFrameInfo.nWidth,CV_8UC1, out_image.data);
+          cam_data.image =
+              GMat(st_out_frame.stFrameInfo.nHeight, st_out_frame.stFrameInfo.nWidth, CV_8UC1, out_image.data);
         }
         if (en_dst_pixel_type == PixelType_Gvsp_Mono8) {
           cam_data.image = GMat(st_out_frame.stFrameInfo.nHeight, st_out_frame.stFrameInfo.nWidth,
@@ -322,4 +318,3 @@ void MvCam::Start() {
   }
 }
 }  // namespace infinite_sense
-
