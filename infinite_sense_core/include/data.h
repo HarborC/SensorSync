@@ -25,10 +25,12 @@ inline void ProcessIMUData(const nlohmann::json &data) {
   imu.g[1] = data["d"][4];
   imu.g[2] = data["d"][5];
   imu.temperature = data["d"][6];
-  imu.q[0] = data["q"][0];
-  imu.q[1] = data["q"][1];
-  imu.q[2] = data["q"][2];
-  imu.q[3] = data["q"][3];
+  if (data.contains("q")) {
+    imu.q[0] = data["q"][0];
+    imu.q[1] = data["q"][1];
+    imu.q[2] = data["q"][2];
+    imu.q[3] = data["q"][3];
+  }
   Messenger::GetInstance().PubStruct("imu_1", &imu, sizeof(imu));
 };
 

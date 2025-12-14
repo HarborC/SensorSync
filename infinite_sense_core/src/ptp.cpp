@@ -47,7 +47,6 @@ void Ptp::HandleTimeSyncResponse(const nlohmann::json& data) {
   try {
     const uint64_t t3 = data.at(func_type_a);
     const uint64_t t4 = GetCurrentTimeUs();
-
     if (updated_t1_t2_) {
       const int64_t delay = static_cast<int64_t>(t4 - t3 + time_t2_ - time_t1_) / 2;
       const int64_t offset = static_cast<int64_t>(time_t2_ - time_t1_ - t4 + t3) / 2;

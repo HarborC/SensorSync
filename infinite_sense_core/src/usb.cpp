@@ -10,7 +10,7 @@ UsbManager::UsbManager(std::string port, const int baud_rate) : port_(std::move(
   try {
     serial_ptr_->setPort(port_);
     serial_ptr_->setBaudrate(baud_rate);
-    serial::Timeout to = serial::Timeout::simpleTimeout(1000);
+    serial::Timeout to = serial::Timeout::simpleTimeout(100);
     serial_ptr_->setTimeout(to);
     serial_ptr_->open();
     if (serial_ptr_->isOpen()) {

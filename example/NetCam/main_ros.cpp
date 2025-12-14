@@ -10,7 +10,7 @@
 struct cam_config {
     bool onboard_imu = true;// 使用内部IMU
     bool extern_imu = false;// 使用外部IMU,TODO 
-    std::string imu_name = "onboard_imu";
+    std::string imu_name = "imu_1";
 
     // 相机名称 + 设备ID
     std::pair<std::string, int> CAM1 = {"cam_1", 1};
@@ -99,7 +99,7 @@ class CamDriver {
 
     if (cfg.onboard_imu) {
       Messenger::GetInstance().SubStruct(
-          cfg.imu_name, std::bind(&CamDriver::ImuCallback, this, std::placeholders::_1, std::placeholders::_2));
+          imu_name_, std::bind(&CamDriver::ImuCallback, this, std::placeholders::_1, std::placeholders::_2));
     }
 
     if (cfg.CAM1.second >= 0) Messenger::GetInstance().SubStruct(cfg.CAM1.first, std::bind(&CamDriver::ImageCallback, this, std::placeholders::_1, std::placeholders::_2));
