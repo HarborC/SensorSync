@@ -36,7 +36,7 @@ inline ros::Time CreateRosTimestamp(const uint64_t mico_sec) {
 
 class CamDriver {
  public:
-  CamDriver(ros::NodeHandle &nh) : node_(nh), it_(node_), camera_name_("cam_1"), imu_name_("imu_1") {}
+  CamDriver(ros::NodeHandle &nh) : node_(nh), it_(node_) {}
   void ImuCallback(const void *msg, size_t) {
     const auto *imu_data = static_cast<const ImuData *>(msg);
     sensor_msgs::Imu imu_msg_data;
@@ -130,8 +130,6 @@ class CamDriver {
   std::unordered_map<std::string, image_transport::Publisher> image_pubs_;
   std::shared_ptr<MvCam> mv_cam_;
   Synchronizer synchronizer_;
-  std::string camera_name_;
-  std::string imu_name_;
 };
 
 int main(int argc, char **argv) {
