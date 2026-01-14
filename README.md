@@ -58,7 +58,7 @@
 # 咨询
 
 [【淘宝】「多相机同步IMU激光雷达Mid360硬件同步板GPS网口串口工业相机ROS」
-点击链接直接打开 或者 淘宝搜索直接打开](https://e.tb.cn/h.7PaY3J0MXneIXCT?tk=y2ukU3dMTOj )
+点击链接直接打开 或者 淘宝搜索直接打开](https://item.taobao.com/item.htm?abbucket=20&id=832624497202&mi_id=0000hMPUBSVCRAYonU3gjxDgfdY-8yA6by6IijyfYwEQCjc&ns=1&priceTId=214787c217683999683236296e0ff7&skuId=5934998856763&spm=a21n57.1.hoverItem.1&utparam=%7B%22aplus_abtest%22%3A%229758fee20f89c46fbabfb29784cc8409%22%7D&xxc=taobaoSearch)
 
 # 感谢  
 
