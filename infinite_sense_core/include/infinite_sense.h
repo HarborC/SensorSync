@@ -1,9 +1,7 @@
 #pragma once
 #include "log.h"
-#include "config.h"
 #include "messenger.h"
 #include "sensor.h"
-#include "trigger.h"
 namespace infinite_sense {
 
 class NetManager;

@@ -1,8 +1,9 @@
 #pragma once
+#include "config.h"
 #include <thread>
 #include <vector>
-#include "messenger.h"
 #include "trigger.h"
+
 namespace infinite_sense {
 class Sensor {
  public:

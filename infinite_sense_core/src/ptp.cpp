@@ -21,9 +21,7 @@ void Ptp::SetNetPtr(const std::shared_ptr<UDPSocket>& net_ptr, const std::string
 
 void Ptp::ReceivePtpData(const nlohmann::json& data) {
   try {
-    const std::string func = data.at(func_name);
-
-    if (func == func_type_a) {
+    if (const std::string func = data.at(func_name); func == func_type_a) {
       HandleTimeSyncRequest(data);
     } else if (func == func_type_b) {
       HandleTimeSyncResponse(data);
