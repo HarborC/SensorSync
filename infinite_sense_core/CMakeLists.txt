@@ -4,9 +4,28 @@ project(infinite_sense_core VERSION 0.1.0)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake CACHE INTERNAL "" FORCE)
 
 find_package(ZeroMQ REQUIRED)
+if(ZeroMQ_FOUND)
+  include(CheckCXXSourceCompiles)
+  set(CMAKE_REQUIRED_INCLUDES ${ZeroMQ_INCLUDE_DIRS})
+  set(CMAKE_REQUIRED_LIBRARIES ${ZeroMQ_LIBRARIES})
+  check_cxx_source_compiles("
+    #include <zmq.hpp>
+    int main() {
+      zmq::context_t ctx;
+      zmq::socket_t s(ctx, ZMQ_SUB);
+      s.set(zmq::sockopt::subscribe, \"\");
+      return 0;
+    }
+  " ZMQ_HAS_NEW_API)
+  if(ZMQ_HAS_NEW_API)
+    add_compile_definitions(USE_NEW_ZMQ_API=1)
+  else()
+    add_compile_definitions(USE_NEW_ZMQ_API=0)
+  endif()
+  message(STATUS "ZeroMQ found")
+endif()
 
 set(PROJECT_INSTALL_DIR ${PROJECT_NAME})
-
 add_compile_options(-fPIC)
 
 set(CMAKE_CXX_STANDARD 17)
