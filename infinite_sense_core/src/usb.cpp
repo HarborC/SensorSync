@@ -30,9 +30,7 @@ UsbManager::UsbManager(std::string port, const int baud_rate) : port_(std::move(
   }
 }
 
-UsbManager::~UsbManager() {
-  Stop();
-}
+UsbManager::~UsbManager() { Stop(); }
 
 void UsbManager::Start() {
   if (!serial_ptr_ || !serial_ptr_->isOpen()) {

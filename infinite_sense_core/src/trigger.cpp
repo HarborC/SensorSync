@@ -3,14 +3,8 @@
 namespace infinite_sense {
 
 std::map<TriggerDevice, std::string> device_map_topics{
-    {IMU_1, "imu_1_trigger"},
-    {IMU_2, "imu_2_trigger"},
-    {CAM_1, "cam_1_trigger"},
-    {CAM_2, "cam_2_trigger"},
-    {CAM_3, "cam_3_trigger"},
-    {CAM_4, "cam_4_trigger"},
-    {LASER, "laser_trigger"},
-    {GPS, "gps_trigger"}};
+    {IMU_1, "imu_1_trigger"}, {IMU_2, "imu_2_trigger"}, {CAM_1, "cam_1_trigger"}, {CAM_2, "cam_2_trigger"},
+    {CAM_3, "cam_3_trigger"}, {CAM_4, "cam_4_trigger"}, {LASER, "laser_trigger"}, {GPS, "gps_trigger"}};
 
 TriggerManger::TriggerManger() {
   uint64_t time = std::numeric_limits<uint64_t>::max();
