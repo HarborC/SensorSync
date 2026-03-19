@@ -33,10 +33,11 @@
 
 # News
 
->1. 支持脉冲占空比调节
->2. 板载IMU频率(航姿解算)提高200HZ。
->3. 完整的[使用说明与系统说明](https://github.com/InfiniteSenseLab/SimpleSensorSync/wiki)发布。
->4. Python-SDK发布，同步可视化工具发布。
+>1. 增加触发引脚电流12mA，提高引脚驱动能力。
+>2. 支持脉冲占空比调节。
+>3. 板载IMU频率(航姿解算)提高200HZ。
+>4. 完整的[使用说明与系统说明](https://github.com/InfiniteSenseLab/SimpleSensorSync/wiki)发布。
+>5. Python-SDK发布，同步可视化工具发布。
 
 <p align="center">
   <img alt="tool" src="https://github.com/user-attachments/assets/6787bf44-0433-4cee-9843-9e48ebab3e41" width="60%">
