@@ -41,9 +41,17 @@
 >6. 完整的[使用说明与系统说明](https://github.com/InfiniteSenseLab/SimpleSensorSync/wiki)发布。
 >7. Python-SDK发布，同步可视化工具发布。
 
-<p align="center">
-  <img alt="tool" src="https://github.com/user-attachments/assets/6787bf44-0433-4cee-9843-9e48ebab3e41" width="60%">
-</p> 
+<table>
+<tr>
+<td align="center">
+<img src="https://github.com/user-attachments/assets/6787bf44-0433-4cee-9843-9e48ebab3e41" width="400">
+</td>
+
+<td align="center">
+<img src="https://private-user-images.githubusercontent.com/22969665/600415113-ec9255e4-0978-4188-a41e-485636df4fad.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3ODAxMDM1ODQsIm5iZiI6MTc4MDEwMzI4NCwicGF0aCI6Ii8yMjk2OTY2NS82MDA0MTUxMTMtZWM5MjU1ZTQtMDk3OC00MTg4LWE0MWUtNDg1NjM2ZGY0ZmFkLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjA1MzAlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYwNTMwVDAxMDgwNFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTQ1NTY2MDI3YTU5MGY3YjRhOTUyZWFkOWRjMmRlMmRiNjU5MGY0ODMxM2NiNjk4YTNmNTY4Njk0ZmU0Yzg3ZGUmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnJlc3BvbnNlLWNvbnRlbnQtdHlwZT1pbWFnZSUyRnBuZyJ9.N47cam81n1R1qCqYbdpgxs10THxirbHQVK_N7DCa54I" width="400">
+</td>
+</tr>
+</table>
 
 # 支持设备
 

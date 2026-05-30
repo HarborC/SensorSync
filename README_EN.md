@@ -28,16 +28,25 @@
 
 # News
 
->1. Onboard IMU chip prices have increased significantly, and the sync board price has been adjusted accordingly.
->2. Increased trigger pin current to 12mA for stronger pin drive capability.
->3. Support for pulse duty cycle adjustment.
->4. Onboard IMU frequency (attitude solution) increased to 200HZ.
->5. Complete [User Manual & System Guide](https://github.com/InfiniteSenseLab/SimpleSensorSync/wiki) released.
->6. Python-SDK released, sync visualization tool released.
+>1. Online auto-configuration tool is now available — open it in Chrome at [imaginative-fenglisu-9fcdf0.netlify.app](https://imaginative-fenglisu-9fcdf0.netlify.app/).
+>2. New Python version user documentation.
+>3. Increased trigger pin current to 12mA for stronger pin drive capability.
+>4. Support for pulse duty cycle adjustment.
+>5. Onboard IMU frequency (attitude solution) increased to 200HZ.
+>6. Complete [User Manual & System Guide](https://github.com/InfiniteSenseLab/SimpleSensorSync/wiki) released.
+>7. Python-SDK released, sync visualization tool released.
 
-<p align="center">
-  <img alt="tool" src="https://github.com/user-attachments/assets/6787bf44-0433-4cee-9843-9e48ebab3e41" width="60%">
-</p>
+<table>
+<tr>
+<td align="center">
+<img src="https://github.com/user-attachments/assets/6787bf44-0433-4cee-9843-9e48ebab3e41" width="400">
+</td>
+
+<td align="center">
+<img src="https://private-user-images.githubusercontent.com/22969665/600415113-ec9255e4-0978-4188-a41e-485636df4fad.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3ODAxMDM1ODQsIm5iZiI6MTc4MDEwMzI4NCwicGF0aCI6Ii8yMjk2OTY2NS82MDA0MTUxMTMtZWM5MjU1ZTQtMDk3OC00MTg4LWE0MWUtNDg1NjM2ZGY0ZmFkLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjA1MzAlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYwNTMwVDAxMDgwNFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTQ1NTY2MDI3YTU5MGY3YjRhOTUyZWFkOWRjMmRlMmRiNjU5MGY0ODMxM2NiNjk4YTNmNTY4Njk0ZmU0Yzg3ZGUmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnJlc3BvbnNlLWNvbnRlbnQtdHlwZT1pbWFnZSUyRnBuZyJ9.N47cam81n1R1qCqYbdpgxs10THxirbHQVK_N7DCa54I" width="400">
+</td>
+</tr>
+</table>
 
 # Supported Devices
 
