@@ -33,12 +33,13 @@
 
 # News
 
->1. 更新pyhton版本使用说明文档。
->2. 增加触发引脚电流12mA，提高引脚驱动能力。
->3. 支持脉冲占空比调节。
->4. 板载IMU频率(航姿解算)提高200HZ。
->5. 完整的[使用说明与系统说明](https://github.com/InfiniteSenseLab/SimpleSensorSync/wiki)发布。
->6. Python-SDK发布，同步可视化工具发布。
+>1. 上线自动配置工具,推荐Chorme浏览器打开[imaginative-fenglisu-9fcdf0.netlify.app](https://imaginative-fenglisu-9fcdf0.netlify.app/)
+>2. 新pyhton版本使用说明文档。
+>3. 增加触发引脚电流12mA，提高引脚驱动能力。
+>4. 支持脉冲占空比调节。
+>5. 板载IMU频率(航姿解算)提高200HZ。
+>6. 完整的[使用说明与系统说明](https://github.com/InfiniteSenseLab/SimpleSensorSync/wiki)发布。
+>7. Python-SDK发布，同步可视化工具发布。
 
 <p align="center">
   <img alt="tool" src="https://github.com/user-attachments/assets/6787bf44-0433-4cee-9843-9e48ebab3e41" width="60%">
