@@ -24,7 +24,11 @@ void TopicMonitor::Stop() {
 TopicMonitor::TopicMonitor() : context_(1), subscriber_(context_, ZMQ_SUB), should_run_(false) {
   try {
     subscriber_.connect("tcp://127.0.0.1:4565");
+#if USE_NEW_ZMQ_API
     subscriber_.set(zmq::sockopt::subscribe, "");
+#else
+    subscriber_.setsockopt(ZMQ_SUBSCRIBE, "", 0);
+#endif
   } catch (const zmq::error_t &e) {
     LOG(ERROR) << "[TopicMonitor] Initialization failed: " << e.what();
     throw;
@@ -44,15 +48,30 @@ void TopicMonitor::MonitorLoop() {
 
   while (should_run_.load()) {
     try {
+#if USE_NEW_ZMQ_API
       if (subscriber_.recv(msg, zmq::recv_flags::dontwait)) {
+#else
+      if (subscriber_.recv(&msg, ZMQ_DONTWAIT)) {
+#endif
         {
           std::string topic(static_cast<char *>(msg.data()), msg.size());
           std::lock_guard lock(topics_mutex_);
           topic_frequencies_[topic]++;
         }
+#if USE_NEW_ZMQ_API
         if (subscriber_.get(zmq::sockopt::rcvmore)) {
+#else
+        int more = 0;
+        size_t more_size = sizeof(more);
+        subscriber_.getsockopt(ZMQ_RCVMORE, &more, &more_size);
+        if (more) {
+#endif
           zmq::message_t dummy;
+#if USE_NEW_ZMQ_API
           subscriber_.recv(dummy);
+#else
+          subscriber_.recv(&dummy, 0);
+#endif
         }
       }
     } catch (const zmq::error_t &e) {
