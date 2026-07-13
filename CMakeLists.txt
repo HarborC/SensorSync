@@ -9,7 +9,7 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -O3  -Wall")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3  -Wall")
 endif ()
-
+find_package(Threads REQUIRED)
 add_subdirectory(infinite_sense_core)
 add_subdirectory(tools)
 add_subdirectory(example)
